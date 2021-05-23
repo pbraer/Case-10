@@ -104,3 +104,22 @@ def war(info):
     else:
         info['land'] -= 200
 
+def purchases(info):
+    info['seedling'] += 50
+    print('Сборы средств на государственные закупки рассады')
+    if info['treasury'] < 50:
+        info['treasury'] == 0
+    else:
+        info['treasury'] -= 50
+
+def explosion(info):
+    print('Из-за неправильной работы разработчиков на космической станции произошел взрыв.')
+    info['opposite'] += 300
+    if info['population'] < 500:
+        info['population'] == 0
+    else:
+        info['population'] -= 500
+
+
+
+
