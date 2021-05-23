@@ -13,6 +13,7 @@ print("""Case-study Игра
 info = {'treasury': 1000, 'land': 0, 'seedling': 0, 'population': 10000, 'opposite': 0, 'money': 500}
 
 # action functions
+from random import randint
 
 def menu(info):
     print('''
@@ -119,6 +120,25 @@ def explosion(info):
         info['population'] == 0
     else:
         info['population'] -= 500
+
+def var(x):
+    x = randint(1, 7)
+    if x == 1:
+        tornado(info)
+    elif x == 2:
+        space_flights(info)
+    elif x == 3:
+        research(info)
+    elif x == 4:
+        war(info)
+    elif x == 5:
+        purchases(info)
+    elif x == 6:
+        explosion(info)
+
+probability = randint(0, 1)
+if probability == 1:
+    var(x)
 
 
 
