@@ -8,24 +8,40 @@ print("""Case-study Игра
 Браер П.С., Кокорина Д.Е., Новоселов В.В.
 """)
 
+from random import randint
+
 # start info
 
-info = {'treasury': 1000, 'land': 0, 'seedling': 0, 'population': 10000, 'opposite': 0, 'money': 500}
+info = {'treasury': 1000, 'land': 0, 'seedling': 0, 'population': 10000, 'opposite': 0, 'money': 600}
 
-# action functions
+# menu function
 
-def menu(info):
+
+def menu(info, step, price):
+    if step == 2:
+        return
     print('''
     1. Хозяйство
     2. Магазин земли
     3. Магазин растений
     3. Казна
     4. Ополченцы
-    5. Завершить игру досрочно
+    5. Ничего не делать сегодня
+    6. Завершить игру досрочно
     ''')
 
+# action functions
 
-def earth_buy(info):
+def land_info(info, step, price):
+    print()
+    print('Земля: ', info['land'], ' Га.    Саженцы: ', info['seedling'], ' шт.', sep='')
+    print()
+    menu(info, step, price)
+
+
+def earth_buy(info, step, price):
+    if step == 2:
+        return
     print('---------------------------')
     print('''
     1. Маленький участок  10 Га  100 Либров
@@ -40,23 +56,159 @@ def earth_buy(info):
     if to_buy == 1:
         if info['money'] < 100:
             print('Недостаточно средств!')
-            earth_buy(info)
+            earth_buy(info, step, price)
         info['money'] = info['money'] - 100
         info['land'] = info['land'] + 10
-        earth_buy(info)
+        earth_buy(info, step)
     if to_buy == 2:
         if info['money'] < 250:
             print('Недостаточно средств!')
-            earth_buy(info)
+            earth_buy(info, step)
         info['money'] = info['money'] - 250
         info['land'] = info['land'] + 25
-        earth_buy(info)
+        earth_buy(info, step, price)
     if to_buy == 3:
         if info['money'] < 500:
             print('Недостаточно средств!')
-            earth_buy(info)
+            earth_buy(info, step, price)
         info['money'] = info['money'] - 500
         info['land'] = info['land'] + 50
-        earth_buy(info)
+        earth_buy(info, step)
     if to_buy == 4:
-        menu(info)
+        menu(info, step, price)
+
+
+def plant_buy(info, price, step):
+    if step == 2:
+        return
+    print('---------------------------')
+    print('Сегодня один саженец Инопланта стоит ', price, ' Л.', sep='')
+    print('(С одного саженца можно получать 1 Либр ежедневно!)')
+    print('---------------------------')
+    print('Ваш баланс: ', info['money'], ' Л.', sep='')
+    print('Чтобы вернуться в Меню, введите "0"')
+    print()
+    to_buy = int(input('Введите число саженцев, которое вы хотите купить: '))
+    if to_buy == 0:
+        menu(info, step, price)
+    elif to_buy * price < info['money']:
+        print('Недостаточно средств!')
+    else:
+        info['seedling'] = info['seedling'] + to_buy
+        step += 1
+        info['money'] -= price
+        plant_buy(info, step, price)
+
+
+def treasury_info(info, step, price):
+    print()
+    print('В казне планеты Кеплер лежит ', info['treasury'], ' Л.', sep='')
+    print()
+    menu(info, step, price)
+
+
+def opposite_info(info, step, price):
+    number = info['opposite']
+    if number % 10 == 1 and number // 10 % 10 != 1:
+        word = 'инопланетянин.'
+    elif 2 <= number % 10 <= 4 and number // 10 % 10 != 1:
+        word = 'инопланетянина.'
+    else:
+        word = 'инопланетян.'
+    print()
+    print('Сейчас против вас', info['opposite'], ' ', word, sep='')
+    print()
+    menu(info, step, price)
+
+
+# random events functions
+
+
+def tornado(info):
+    print('На планете Кеплер произошло торнадо. Количество растений уменьшилось')
+    if info['treasury'] < 100:
+        info['treasury'] == 0
+    else:
+        info['treasury'] -= 100
+    if info['seedling'] < 50:
+        info['seedling'] == 0
+    else:
+        info['seedling'] -= 50
+    return info
+
+
+def space_flights(info):
+    print('Обязательное пожертвование на полеты в другие галактики для увеличения населения!')
+    info['population'] += 1000
+    if info['treasury'] <= 200:
+        info['treasury'] == 0
+    else:
+        info['treasury'] -= 200
+    return info
+
+def research(info):
+    print('..')
+    if info['land'] <= 300:
+        info['land'] == 0
+    else:
+        info['land'] += 300
+    if info['opposite'] >= 50:
+        info['opposite'] -= 50
+    else:
+        info['opposite'] == 0
+    return info
+
+
+def war(info):
+    print('На планету Кеплер прилетели захватчики и развязалась война... срочно нужны средства на оборону.')
+    info['opposite'] += 100
+    if info['treasury'] <= 300:
+        info['treasury'] == 0
+    else:
+        info['treasury'] -= 300
+    if info['land'] <= 200:
+        info['land'] == 0
+    else:
+        info['land'] -= 200
+    return info
+
+
+def purchases(info):
+    info['seedling'] += 50
+    print('Сборы средств на государственные закупки рассады')
+    if info['treasury'] < 50:
+        info['treasury'] == 0
+    else:
+        info['treasury'] -= 50
+    return info
+
+
+def explosion(info):
+    print('Из-за неправильной работы разработчиков на космической станции произошел взрыв.')
+    info['opposite'] += 300
+    if info['population'] < 500:
+        info['population'] == 0
+    else:
+        info['population'] -= 500
+    return info
+
+
+def var(info):
+    x = randint(1, 7)
+    if x == 1:
+        tornado(info)
+    elif x == 2:
+        space_flights(info)
+    elif x == 3:
+        research(info)
+    elif x == 4:
+        war(info)
+    elif x == 5:
+        purchases(info)
+    elif x == 6:
+        explosion(info)
+
+probability = randint(0, 1)
+if probability == 1:
+    var(x)
+
