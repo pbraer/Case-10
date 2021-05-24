@@ -12,8 +12,13 @@ from random import randint
 
 # start info
 
-info = {'treasury': 1000, 'land': 0, 'seedling': 0, 'population': 10000, 'opposite': 0, 'money': 600}
-
+info = {}
+info['treasury'] = 1000
+info['land'] = 0
+info['seedling'] = 0
+info['population'] = 10000
+info['opposite'] = 0
+info['money'] = 600
 # menu function
 
 
@@ -29,8 +34,26 @@ def menu(info, step, price):
     5. Ничего не делать сегодня
     6. Завершить игру досрочно
     ''')
+    choice = int(input())
+    if choice == 1:
+        land_info(info, step, price)
+    elif choice == 2:
+        earth_buy(info, step, price)
+    elif choice == 3:
+        plant_buy(info, step, price)
+    elif choice == 4:
+        treasury_info(info, step, price)
+    elif choice == 5:
+        opposite_info(info, step, price)
+    elif choice == 6:
+        return info
+    elif choice == 7:
+        return {}
+
+
 
 # action functions
+
 
 def land_info(info, step, price):
     print()
@@ -41,7 +64,7 @@ def land_info(info, step, price):
 
 def earth_buy(info, step, price):
     if step == 2:
-        return
+        return info
     print('---------------------------')
     print('''
     1. Маленький участок  10 Га  100 Либров
@@ -59,28 +82,31 @@ def earth_buy(info, step, price):
             earth_buy(info, step, price)
         info['money'] = info['money'] - 100
         info['land'] = info['land'] + 10
-        earth_buy(info, step)
+        earth_buy(info, step, price)
+        step += 1
     if to_buy == 2:
         if info['money'] < 250:
             print('Недостаточно средств!')
-            earth_buy(info, step)
+            earth_buy(info, step, price)
         info['money'] = info['money'] - 250
         info['land'] = info['land'] + 25
         earth_buy(info, step, price)
+        step += 1
     if to_buy == 3:
         if info['money'] < 500:
             print('Недостаточно средств!')
             earth_buy(info, step, price)
         info['money'] = info['money'] - 500
         info['land'] = info['land'] + 50
-        earth_buy(info, step)
+        step += 1
+        earth_buy(info, step, price)
     if to_buy == 4:
         menu(info, step, price)
 
 
-def plant_buy(info, price, step):
+def plant_buy(info, step, price):
     if step == 2:
-        return
+        return info
     print('---------------------------')
     print('Сегодня один саженец Инопланта стоит ', price, ' Л.', sep='')
     print('(С одного саженца можно получать 1 Либр ежедневно!)')
@@ -91,12 +117,12 @@ def plant_buy(info, price, step):
     to_buy = int(input('Введите число саженцев, которое вы хотите купить: '))
     if to_buy == 0:
         menu(info, step, price)
-    elif to_buy * price < info['money']:
+    elif to_buy * price > info['money']:
         print('Недостаточно средств!')
     else:
         info['seedling'] = info['seedling'] + to_buy
+        info['money'] -= price * to_buy
         step += 1
-        info['money'] -= price
         plant_buy(info, step, price)
 
 
@@ -127,70 +153,65 @@ def opposite_info(info, step, price):
 def tornado(info):
     print('На планете Кеплер произошло торнадо. Количество растений уменьшилось')
     if info['treasury'] < 100:
-        info['treasury'] == 0
+        info['treasury'] = 0
     else:
         info['treasury'] -= 100
     if info['seedling'] < 50:
-        info['seedling'] == 0
+        info['seedling'] = 0
     else:
         info['seedling'] -= 50
-    return info
 
 
 def space_flights(info):
     print('Обязательное пожертвование на полеты в другие галактики для увеличения населения!')
     info['population'] += 1000
     if info['treasury'] <= 200:
-        info['treasury'] == 0
+        info['treasury'] = 0
     else:
         info['treasury'] -= 200
-    return info
+
 
 def research(info):
     print('..')
     if info['land'] <= 300:
-        info['land'] == 0
+        info['land'] = 0
     else:
         info['land'] += 300
     if info['opposite'] >= 50:
         info['opposite'] -= 50
     else:
-        info['opposite'] == 0
-    return info
+        info['opposite'] = 0
 
 
 def war(info):
     print('На планету Кеплер прилетели захватчики и развязалась война... срочно нужны средства на оборону.')
     info['opposite'] += 100
     if info['treasury'] <= 300:
-        info['treasury'] == 0
+        info['treasury'] = 0
     else:
         info['treasury'] -= 300
     if info['land'] <= 200:
-        info['land'] == 0
+        info['land'] = 0
     else:
-        info['land'] -= 200
-    return info
+        info['land'] = info['land'] - 200
 
 
 def purchases(info):
-    info['seedling'] += 50
+    info['seedling'] = info['seedling'] + 50
     print('Сборы средств на государственные закупки рассады')
     if info['treasury'] < 50:
-        info['treasury'] == 0
+        info['treasury'] = 0
     else:
-        info['treasury'] -= 50
-    return info
+        info['treasury'] = 50
 
 
 def explosion(info):
     print('Из-за неправильной работы разработчиков на космической станции произошел взрыв.')
     info['opposite'] += 300
     if info['population'] < 500:
-        info['population'] == 0
+        info['population'] = 0
     else:
-        info['population'] -= 500
-    return info
+        info['population'] = info['population'] - 500
 
 
 def var(info):
@@ -207,8 +228,33 @@ def var(info):
         purchases(info)
     elif x == 6:
         explosion(info)
+    return info
 
-probability = randint(0, 1)
-if probability == 1:
-    var(x)
+
+# main function
+
+
+
+for day in range(1, 21):
+    if info == {}:
+        break
+    if info['money'] <= 5 or info['opposite'] >= 1000 or info['population'] <= 10: #?
+        print('''
+
+        ▄▀▀░ ▄▀▄ █▄░▄█ █▀▀     ▄▀▄ ▐▌░▐▌ █▀▀ █▀▀▄ 
+        █░▀▌ █▀█ █░█░█ █▀▀     █░█ ░▀▄▀░ █▀▀ █▐█▀ 
+        ▀▀▀░ ▀░▀ ▀░░░▀ ▀▀▀     ░▀░ ░░▀░░ ▀▀▀ ▀░▀▀ 
+
+        ''')
+        break
+    print('---------------------------')
+    print('          ДЕНЬ ', day, sep='')
+    print('---------------------------')
+    step = 1
+    price = randint(1, 50)
+    info = menu(info, step, price)
+    probability = randint(0, 1)
+    if probability == 1:
+        info = var(info)
+
 
