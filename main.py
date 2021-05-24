@@ -1,6 +1,6 @@
 # Case-study №10
 # Developers:   Braer P. (75%),
-#               Kokorina D. (%),
+#               Kokorina D. (50%),
 #               Novoselov V. (0%)
 
 print("""Case-study Игра
